@@ -4,6 +4,6 @@
 
 Um plugin feito para integrar sua loja ao seu servidor.
 
-## Comandos
+## Comando
 
 ```/pay2ply <token do servidor>```
