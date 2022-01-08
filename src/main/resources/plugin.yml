@@ -1,0 +1,8 @@
+name: Pay2Ply
+main: com.pay2ply.spigot.Pay2Ply
+version: 0.0.1
+author: MrDrawn
+commands:
+  pay2ply:
+    permission: pay2ply.command
+    description: Vincule seu servidor a sua loja.

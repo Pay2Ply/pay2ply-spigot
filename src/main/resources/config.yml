@@ -1,0 +1,5 @@
+settings:
+  # Token do servidor
+  token: '00000000-0000-0000-0000-000000000000'
+  # Mensagens de ativação de produtos no console
+  messages: false
