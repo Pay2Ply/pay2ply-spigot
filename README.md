@@ -2,7 +2,7 @@
 
 # Pay2Ply - SPIGOT
 
-Um plugin feito para integrar sua loja ao seu servidor.
+Plugin feito para que seu servidor faça a conexão com nossa API's e pegue todos os dados necessarios na ativação do produto.
 
 ## Comando
 
