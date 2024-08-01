@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.github.GilbertoKPL</groupId>
             <artifactId>pay2ply-sdk</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.4</version>
         </dependency>
     </dependencies>
 
