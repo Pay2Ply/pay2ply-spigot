@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import java.util.concurrent.CompletableFuture;
 
 public class Pay2Ply extends JavaPlugin {
     private static Pay2Ply instance;
@@ -35,41 +36,43 @@ public class Pay2Ply extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Dispense[] dispenses = null;
+                // Use supplyAsync to handle the future
+                CompletableFuture.supplyAsync(() -> {
+                    try {
+                        // Recupera os dispensers de forma assíncrona
+                        return sdk.getDispenses().join(); // Usa join() para esperar o resultado
+                    } catch (Exception e) {
+                        Bukkit.getLogger().warning(String.format("[%s] %s", getDescription().getName(), e.getMessage()));
+                        return new Dispense[0]; // Retorna um array vazio em caso de erro
+                    }
+                }).thenAccept(dispensesArray -> {
+                    if (dispensesArray != null && dispensesArray.length > 0) { // Verifica se o array não é vazio
+                        for (Dispense dispense : dispensesArray) {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Player player = getServer().getPlayerExact(dispense.getUsername());
 
-                try {
-                    dispenses = sdk.getDispenses();
-                } catch (Exception exception) {
-                    Bukkit.getLogger().warning(String.format("[%s] %s", getDescription().getName(), exception.getMessage()));
-                }
+                                    if (player != null) {
+                                        try {
+                                            sdk.update(dispense.getUsername(), dispense.getId());
+                                            getServer().dispatchCommand(getServer().getConsoleSender(), dispense.getCommand());
 
-                if (dispenses == null) {
-                    return;
-                }
-
-                for (Dispense dispense : dispenses) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            Player player = getServer().getPlayerExact(dispense.getUsername());
-
-                            if (player == null) {
-                                return;
-                            }
-
-                            try {
-                                sdk.update(dispense.getUsername(), dispense.getId());
-                                getServer().dispatchCommand(getServer().getConsoleSender(), dispense.getCommand());
-
-                                if (getConfig().getBoolean("settings.messages")) {
-                                    Bukkit.getLogger().info(String.format("[%s] O produto de %s foi ativo.", getDescription().getName(), dispense.getUsername()));
+                                            if (getConfig().getBoolean("settings.messages")) {
+                                                Bukkit.getLogger().info(String.format("[%s] O produto de %s foi ativo.", getDescription().getName(), dispense.getUsername()));
+                                            }
+                                        } catch (Exception exception) {
+                                            Bukkit.getLogger().warning(String.format("[%s] %s", getDescription().getName(), exception.getMessage()));
+                                        }
+                                    }
                                 }
-                            } catch (Exception exception) {
-                                Bukkit.getLogger().warning(String.format("[%s] %s", getDescription().getName(), exception.getMessage()));
-                            }
+                            }.runTask(getInstance());
                         }
-                    }.runTask(getInstance());
-                }
+                    }
+                }).exceptionally(ex -> {
+                    Bukkit.getLogger().warning(String.format("[%s] %s", getDescription().getName(), ex.getMessage()));
+                    return null;
+                });
             }
         }.runTaskTimerAsynchronously(this, 60 * 20, 20 * 20);
     }
