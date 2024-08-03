@@ -1,5 +1,5 @@
 name: Pay2Ply
-main: com.pay2ply.spigot.Pay2Ply
+main: com.pay2ply.spigot.Pay2PlyPlugin
 version: 0.0.2
 author: MrDrawn
 commands:
